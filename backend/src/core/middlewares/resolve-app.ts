@@ -1,19 +1,13 @@
 import crypto from "crypto";
-import { Request, Response, NextFunction } from "express";
-import { eq, and } from "drizzle-orm";
+import { Response, NextFunction } from "express";
+import { and, eq } from "drizzle-orm";
 
 import { db } from "../db";
 import { apiKeys } from "../db/schema";
-
-type CustomRequest = Omit<Request, "context"> & {
-  context?: {
-    userId?: number;
-    appId?: number;
-  };
-};
+import { AppRequest } from "../types/app-request";
 
 export const resolveApp = async (
-  req: CustomRequest,
+  req: AppRequest,
   res: Response,
   next: NextFunction
 ): Promise<void> => {
@@ -32,7 +26,6 @@ export const resolveApp = async (
       .createHash("sha256")
       .update(apiKey)
       .digest("hex");
-    console.log(db.query);
 
     const [key] = await db
       .select()
@@ -44,7 +37,6 @@ export const resolveApp = async (
         )
       )
       .limit(1);
-    
 
     if (!key) {
       res.status(401).json({
@@ -58,6 +50,8 @@ export const resolveApp = async (
       ...req.context,
       appId: key.appId,
     };
+
+    console.log("RESOLVE APP:", req.context);
 
     next();
 

@@ -11,15 +11,6 @@ export const registerUser = async (
   password: string,
   appId: number
 ) => {
-  // buscar app
-  const appResult = await db
-    .select()
-    .from(apps)
-    .where(eq(apps.id, appId))
-    .limit(1);
-
-  const app = appResult[0];
-  if (!app) throw new Error("App not found");
 
   // check user
   const existing = await db
@@ -54,24 +45,24 @@ export const registerUser = async (
 
     // verificar si ya existe relación user-app
   const existingRelation = await db
-    .select()
-    .from(userApps)
-    .where(
-      and(
-        eq(userApps.userId, user.id),
-        eq(userApps.appId, app.id)
-      )
+  .select()
+  .from(userApps)
+  .where(
+    and(
+      eq(userApps.userId, user.id),
+      eq(userApps.appId, appId)
     )
-    .limit(1);
+  )
+  .limit(1);
 
-  // crear relación sólo si no existe
-  if (existingRelation.length === 0) {
-    await db.insert(userApps).values({
-      userId: user.id,
-      appId: app.id,
-      role: "user",
-    });
-  }
+if (existingRelation.length === 0) {
+  await db.insert(userApps).values({
+    userId: user.id,
+    appId,
+    role: "user",
+  });
+}
+
 
   return { id: user.id, email: user.email };
 };
@@ -93,17 +84,6 @@ export const loginUser = async (
   const valid = await bcrypt.compare(password, user.password);
   if (!valid) throw new Error("Invalid credentials");
 
-  // buscar app
-  const appResult = await db
-    .select()
-    .from(apps)
-    .where(eq(apps.id, appId))
-    .limit(1);
-
-  const app = appResult[0];
-  if (!app) throw new Error("App not found");
-
-  // verificar acceso
   // verificar acceso
   const access = await db
     .select()
@@ -111,24 +91,24 @@ export const loginUser = async (
     .where(
       and(
         eq(userApps.userId, user.id),
-        eq(userApps.appId, app.id)
+        eq(userApps.appId, appId)
       )
     )
     .limit(1);
 
   // si no existe relación, crearla
   if (access.length === 0) {
-    await db.insert(userApps).values({
-      userId: user.id,
-      appId: app.id,
-      role: "user",
-    });
+      await db.insert(userApps).values({
+        userId: user.id,
+        appId,
+        role: "user",
+      });
   }
 
   const token = jwt.sign(
     {
       userId: user.id,
-      appId: app.id,
+      appId,
     },
     ENV.JWT_SECRET,
     { expiresIn: "1h" }

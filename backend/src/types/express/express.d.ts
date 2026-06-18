@@ -6,6 +6,7 @@ declare global {
       context?: {
         userId?: number;
         appId?: number;
+        role?: string;
       };
     }
   }

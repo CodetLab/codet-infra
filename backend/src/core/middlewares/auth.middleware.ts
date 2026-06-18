@@ -9,22 +9,31 @@ export const authMiddleware = (
   const header = req.headers.authorization;
 
   if (!header) {
-    return res.status(401).json({ error: "Unauthorized" });
+    return res.status(401).json({
+      error: "Unauthorized",
+    });
   }
 
   const token = header.split(" ")[1];
 
   try {
-    const decoded = jwt.verify(token, process.env.JWT_SECRET!) as any;
+    const decoded = jwt.verify(
+      token,
+      process.env.JWT_SECRET!
+    ) as any;
 
     req.context = {
-      userId: decoded.sub,
+      ...req.context,
+      userId: decoded.userId,
       appId: decoded.appId,
       role: decoded.role,
     };
 
     return next();
+
   } catch {
-    return res.status(401).json({ error: "Invalid token" });
+    return res.status(401).json({
+      error: "Invalid token",
+    });
   }
 };

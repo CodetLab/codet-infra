@@ -7,13 +7,23 @@ export const register = async (
   res: Response
 ) => {
   try {
+
+    console.log("REGISTER CONTEXT", req.context);
+
     const { email, password } = req.body;
 
-    const user = await registerUser(email, password, req.context?.appId!);
+    const user = await registerUser(
+      email,
+      password,
+      req.context?.appId!
+    );
 
     res.json(user);
+
   } catch (err: any) {
-    res.status(400).json({ error: err.message });
+    res.status(400).json({
+      error: err.message,
+    });
   }
 };
 
