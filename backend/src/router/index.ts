@@ -15,8 +15,9 @@ router.get("/health", (req, res) => {
   res.json({ status: "ok" });
 });
 
-router.get("/private", authMiddleware, (req, res) => {
-  res.json({ message: "ok" });
+router.use("/account", authMiddleware, (req, res) => {
+  const userId = (req as any).context.userId;
+  res.json({ userId });
 });
 
 router.post(
