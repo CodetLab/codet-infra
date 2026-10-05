@@ -197,3 +197,86 @@ export const emails = pgTable("emails", {
   createdAt: timestamp("created_at", { withTimezone: true }).defaultNow(),
 });
 
+/* =========================
+   INVITATIONS
+========================= */
+
+export const invitations = pgTable(
+  "invitations",
+  {
+    id: uuid("id").defaultRandom().primaryKey(),
+
+    appId: integer("app_id")
+      .notNull()
+      .references(() => apps.id, {
+        onDelete: "cascade",
+      }),
+
+    invitedBy: integer("invited_by")
+      .notNull()
+      .references(() => users.id, {
+        onDelete: "cascade",
+      }),
+
+    email: text("email").notNull(),
+
+    resourceType: text("resource_type").notNull(),
+
+    resourceId: text("resource_id").notNull(),
+
+    resourceAction: text("resource_action")
+      .notNull()
+      .default("join"),
+
+    role: text("role").notNull(),
+
+    tokenHash: text("token_hash")
+      .notNull()
+      .unique(),
+
+    status: text("status")
+      .notNull()
+      .default("pending"),
+
+    expiresAt: timestamp("expires_at", {
+      withTimezone: true,
+    }).notNull(),
+
+    acceptedAt: timestamp("accepted_at", {
+      withTimezone: true,
+    }),
+
+    acceptedBy: integer("accepted_by")
+      .references(() => users.id, {
+        onDelete: "set null",
+      }),
+
+    createdAt: timestamp("created_at", {
+      withTimezone: true,
+    }).defaultNow(),
+
+    updatedAt: timestamp("updated_at", {
+      withTimezone: true,
+    }).defaultNow(),
+  },
+  (table) => ({
+    appResourceIdx: index(
+      "idx_invitations_app_resource"
+    ).on(
+      table.appId,
+      table.resourceType,
+      table.resourceId
+    ),
+
+    emailStatusIdx: index(
+      "idx_invitations_email_status"
+    ).on(
+      table.email,
+      table.status
+    ),
+
+    tokenHashIdx: index(
+      "idx_invitations_token_hash"
+    ).on(table.tokenHash),
+  })
+);

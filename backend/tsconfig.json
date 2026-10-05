@@ -22,6 +22,8 @@
 
     "incremental": true,
   },
-  "include": ["src"],
+  "include": [
+    "src",
+  ],
   "exclude": ["node_modules", "dist"]
 }

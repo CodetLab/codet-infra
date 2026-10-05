@@ -10,6 +10,11 @@ app.set("trust proxy", true);
 app.use(cors());
 app.use(express.json());
 
+app.use((req, res, next) => {
+    console.log(req.method, req.path, req.body);
+    next();
+});
+
 app.use("/api", router);
 
 const PORT = process.env.PORT || 5000;

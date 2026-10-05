@@ -4,6 +4,7 @@ import accountRoutes from "../modules/account/account.routes";
 import { resolveApp } from "../core/middlewares/resolve-app";
 import { sendMailController } from "../modules/mailer/sendMail.controller";
 import contactRoutes from "../modules/contact/contact.routes";
+import invitationRoutes from "../modules/invitations/invitation.routes";
 
 const router = Router();
 
@@ -16,6 +17,8 @@ router.get("/health", (req, res) => {
 });
 
 router.use("/account", accountRoutes);
+
+router.use("/invitations", invitationRoutes);
 
 router.post(
   "/send",

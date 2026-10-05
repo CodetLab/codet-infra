@@ -6,9 +6,7 @@ export class InvitationNotFoundError extends Error {
 
 export class InvitationAlreadyExistsError extends Error {
     constructor() {
-        super(
-            "A pending invitation already exists."
-        );
+        super("A pending invitation already exists.");
     }
 }
 
@@ -20,8 +18,6 @@ export class InvitationExpiredError extends Error {
 
 export class InvitationNotPendingError extends Error {
     constructor() {
-        super(
-            "Invitation is no longer pending."
-        );
+        super("Invitation is no longer pending.");
     }
 }
